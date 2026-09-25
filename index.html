@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EC1 Speaking Pretest Randomizer</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #333333;
+            --container-bg: #ffffff;
+            --primary-btn: #007bff;
+            --primary-btn-hover: #0056b3;
+            --sound-btn: #28a745;
+            --sound-btn-hover: #1e7e34;
+            --translate-btn: #17a2b8;
+            --translate-btn-hover: #117a8b;
+            --chapter-color: #0056b3;
+            --translation-color: #6c757d;
+            --badge-bg: #e2e8f0;
+            --badge-text: #475569;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --primary-btn: #bb86fc;
+            --primary-btn-hover: #9965f4;
+            --sound-btn: #03dac6;
+            --sound-btn-hover: #01b3a1;
+            --translate-btn: #ffb74d;
+            --translate-btn-hover: #f57c00;
+            --chapter-color: #bb86fc;
+            --translation-color: #b0bec5;
+            --badge-bg: #334155;
+            --badge-text: #cbd5e1;
+            --shadow: rgba(0,0,0,0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            background-color: transparent;
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        #question-container {
+            background: var(--container-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px var(--shadow);
+            max-width: 750px;
+            width: 100%;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            position: relative;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .chapter-label {
+            font-weight: bold;
+            color: var(--chapter-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        #counter-badge {
+            display: inline-block;
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        #question-text {
+            font-size: 1.35rem;
+            line-height: 1.6;
+        }
+
+        #translation-text {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--translation-color);
+            font-style: italic;
+            display: none;
+            border-top: 1px dashed var(--translation-color);
+            padding-top: 15px;
+            width: 100%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .action-btn { background-color: var(--primary-btn); }
+        .action-btn:hover { background-color: var(--primary-btn-hover); }
+
+        .sound-btn { background-color: var(--sound-btn); }
+        .sound-btn:hover { background-color: var(--sound-btn-hover); }
+
+        .translate-btn { background-color: var(--translate-btn); }
+        .translate-btn:hover { background-color: var(--translate-btn-hover); }
+
+        .btn:active { transform: translateY(2px); }
+        
+        [data-theme="dark"] .btn {
+            color: #121212;
+            font-weight: bold;
+        }
+
+        .auto-sound-label {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-controls">
+        <label class="auto-sound-label">
+            <input type="checkbox" id="auto-sound"> Auto-Read Sound
+        </label>
+        <button class="toggle-btn" onclick="toggleTheme()">Toggle Dark Mode</button>
+    </div>
+
+    <h1>EC1 Speaking Pretest</h1>
+    
+    <div id="question-container">
+        <span id="counter-badge">Remaining: 30 / 30</span>
+        <div class="chapter-label" id="chapter-label">Ready to begin?</div>
+        <div id="question-text">Click the button below to draw a random question without repeats.</div>
+        <div id="translation-text"></div>
+    </div>
+
+    <div class="button-group">
+        <button class="btn action-btn" onclick="generateRandomQuestion()">Get Random Question</button>
+        <button class="btn sound-btn" onclick="speakQuestion()">🔊 Read Aloud</button>
+        <button class="btn translate-btn" onclick="toggleTranslation()">🌐 Translate (Thai)</button>
+    </div>
+
+    <script>
+        const allQuestions = [
+            // Chapter 2
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "What are scary things you've heard that still scare you until today? Where did you hear it from?",
+                thai: "เรื่องน่ากลัวอะไรที่คุณเคยได้ยินมาและยังคงทำให้คุณกลัวอยู่จนถึงทุกวันนี้? คุณได้ยินมาจากไหน?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "Tell me about an experience you cannot forget. Why was it interesting? If you could go back in time and do/experience it again, would you do it?",
+                thai: "เล่าเกี่ยวกับประสบการณ์ที่คุณลืมไม่ลงให้ฟังหน่อย ทำไมมันถึงน่าสนใจ? ถ้าคุณย้อนเวลากลับไปและสัมผัสประสบการณ์นั้นได้อีกครั้ง คุณจะทำไหม?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "When was the first time you learned English? How was it? Do you think your English is getting better?",
+                thai: "คุณเรียนภาษาอังกฤษครั้งแรกเมื่อไหร่? เป็นอย่างไรบ้าง? คุณคิดว่าภาษาอังกฤษของคุณดีขึ้นไหม?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "What was the scariest thing that happened to you in the past? Tell your story. What was the result of the experience?",
+                thai: "อะไรคือเรื่องที่น่ากลัวที่สุดที่เคยเกิดขึ้นกับคุณในอดีต? เล่าเรื่องของคุณ ผลลัพธ์ของประสบการณ์นั้นคืออะไร?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "What did you do in the past that made you feel proud?",
+                thai: "ในอดีตคุณเคยทำอะไรที่ทำให้คุณรู้สึกภาคภูมิใจ?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "What's your favourite childhood memory?",
+                thai: "ความทรงจำในวัยเด็กที่คุณชื่นชอบที่สุดคืออะไร?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "Can you tell me the past event that still affects your life? How has it affected you?",
+                thai: "ช่วยเล่าเหตุการณ์ในอดีตที่ยังคงส่งผลต่อชีวิตคุณจนถึงทุกวันนี้ได้ไหม? มันส่งผลต่อคุณอย่างไร?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "What is one of the horror films you have watched? Tell a brief story. How were you feeling while watching that movie?",
+                thai: "หนังสยองขวัญเรื่องหนึ่งที่คุณเคยดูคือเรื่องอะไร? เล่าเรื่องย่อสั้น ๆ รู้สึกอย่างไรขณะดูภาพยนตร์เรื่องนั้น?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "What do you consider unlucky? What are the superstitions in your country?",
+                thai: "อะไรที่คุณถือว่าเป็นเรื่องโชคร้าย? ความเชื่อหรือเรื่องลางสังหรณ์ในประเทศของคุณมีอะไรบ้าง?"
+            },
+            { 
+                chapter: "Chapter 2: Stranger Things", 
+                text: "Tell me about the last time you laughed really hard. What was that about?",
+                thai: "เล่าถึงครั้งล่าสุดที่คุณหัวเราะหนักมาก มันเกี่ยวกับอะไร?"
+            },
+
+            // Chapter 3
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "Have you ever had food that was from another country before? How did you like it? Would you eat it again and recommend it to others? How is it compared to the food of your country?",
+                thai: "คุณเคยทานอาหารจากประเทศอื่นมาก่อนไหม? ชอบไหม? คุณจะทานอีกและแนะนำให้คนอื่นไหม? เมื่อเทียบกับอาหารในประเทศของคุณแล้วเป็นอย่างไร?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "An exchange student will stay with you and your family for 1 semester. You have to introduce them to Thai culture. What are the first things you will teach them? What are the dos and the don'ts when they are in Thailand?",
+                thai: "นักเรียนแลกเปลี่ยนจะมาอยู่กับคุณและครอบครัวเป็นเวลา 1 เทอม คุณต้องแนะนำให้เขารู้จักวัฒนธรรมไทย สิ่งแรกที่คุณจะสอนเขาคืออะไร? อะไรคือสิ่งที่ควรทำและไม่ควรทำเมื่ออยู่ในประเทศไทย?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "Would you ever consider marrying or dating someone from another culture? Why?",
+                thai: "คุณเคยคิดที่จะแต่งงานหรือเดตกับคนต่างวัฒนธรรมไหม? เพราะเหตุใด?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "Tell me about one or two eating habits that you know from other countries!",
+                thai: "เล่าเกี่ยวกับวัฒนธรรมการกิน 1-2 อย่างที่คุณรู้จักจากประเทศอื่นให้ฟังหน่อย!"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "How do you feel when someone you are first greeting wants to hug and kiss you on the cheeks? Could you please explain the appropriate greetings and customs in your country?",
+                thai: "คุณรู้สึกอย่างไรเมื่อคนที่คุณทักทายครั้งแรกต้องการกอดและหอมแก้มคุณ? ช่วยอธิบายการทักทายและขนบธรรมเนียมที่เหมาะสมในประเทศของคุณหน่อยได้ไหม?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "What is something that you have learned about another country that you like? How is this different from your own country?",
+                thai: "สิ่งที่คุณได้เรียนรู้เกี่ยวกับประเทศอื่นแล้วชอบคืออะไร? สิ่งนี้แตกต่างจากประเทศของคุณอย่างไร?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "What will you explain to foreigners to have a good understanding of eating behavior in your country?",
+                thai: "คุณจะอธิบายอะไรให้ชาวต่างชาติเข้าใจเกี่ยวกับพฤติกรรมการรับประทานอาหารในประเทศของคุณได้อย่างถูกต้อง?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "What do you like and dislike about your culture?",
+                thai: "อะไรคือสิ่งที่คุณชอบและไม่ชอบเกี่ยวกับวัฒนธรรมของคุณ?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "Have you ever experienced culture shock? If so, what was the event or custom that was different or new to you?",
+                thai: "คุณเคยเจอกับภาวะ Culture Shock ไหม? ถ้าเคย เหตุการณ์หรือขนบธรรมเนียมใดที่แตกต่างหรือใหม่สำหรับคุณ?"
+            },
+            { 
+                chapter: "Chapter 3: When in Rome...", 
+                text: "Tell me about gift-giving customs in your country.",
+                thai: "เล่าเกี่ยวกับขนบธรรมเนียมการให้ของขวัญในประเทศของคุณให้ฟังหน่อย"
+            },
+
+            // Chapter 4
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "Have you entered or joined a competition in school? What happened? How did you feel when you finished the competition?",
+                thai: "คุณเคยเข้าร่วมการแข่งขันในโรงเรียนไหม? เกิดอะไรขึ้นบ้าง? คุณรู้สึกอย่างไรเมื่อการแข่งขันจบลง?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "Have you ever been caught cheating during an exam? What happened? What did you learn from the situation?",
+                thai: "คุณเคยถูกจับได้ว่าทุจริตในการสอบไหม? เกิดอะไรขึ้น? คุณได้เรียนรู้อะไรจากสถานการณ์นั้น?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "What is the best restaurant you have ever been to? What did you eat?",
+                thai: "ร้านอาหารที่ดีที่สุดที่คุณเคยไปคือร้านไหน? คุณทานอะไร?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "What is the craziest thing you have ever done? Why did you do that?",
+                thai: "อะไรคือสิ่งที่บ้าที่สุดที่คุณเคยทำ? ทำไมคุณถึงทำแบบนั้น?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "What is the strangest food you have ever eaten? Why did you eat it? Describe how it tasted. Would you eat it again?",
+                thai: "อาหารที่แปลกที่สุดที่คุณเคยทานคืออะไร? ทำไมคุณถึงทานมัน? อธิบายรสชาติของมัน คุณจะทานมันอีกไหม?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "Have you ever found yourself in a dilemma or an emergency? Tell me about it.",
+                thai: "คุณเคยตกอยู่ในสถานการณ์กลืนไม่เข้าคายไม่ออกหรือสถานการณ์ฉุกเฉินไหม? เล่าให้ฟังหน่อย"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "Have you ever learnt to play a musical instrument? If yes, what was the experience like? If not, what instrument would you like to learn in the future, and why?",
+                thai: "คุณเคยเรียนเล่นเครื่องดนตรีไหม? ถ้าเคย ประสบการณ์นั้นเป็นอย่างไร? ถ้าไม่ ในอนาคตคุณอยากเรียนเครื่องดนตรีอะไร และเพราะเหตุใด?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "Have you ever felt homesick when studying here? How do you deal with it?",
+                thai: "คุณเคยรู้สึกคิดถึงบ้าน (Homesick) เวลาเรียนที่นี่ไหม? คุณจัดการกับมันอย่างไร?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "Have you ever had a funny travelling experience in Thailand or overseas? What happened?",
+                thai: "คุณเคยมีประสบการณ์การท่องเที่ยวที่ตลกๆ ในประเทศไทย (หรือต่างประเทศ) ไหม? เกิดอะไรขึ้น?"
+            },
+            { 
+                chapter: "Chapter 4: Been there Done That", 
+                text: "What have you done so far to achieve your life goals?",
+                thai: "จนถึงตอนนี้ คุณได้ทำอะไรไปบ้างแล้วเพื่อบรรลุเป้าหมายในชีวิตของคุณ?"
+            }
+        ];
+
+        let questionPool = [...allQuestions];
+        let currentThaiTranslation = "";
+
+        function generateRandomQuestion() {
+            // Reset deck if empty
+            if (questionPool.length === 0) {
+                alert("All 30 questions have been asked! Resetting the questions pool for a new round.");
+                questionPool = [...allQuestions];
+            }
+
+            // Pick a random question without replacement
+            const randomIndex = Math.floor(Math.random() * questionPool.length);
+            const selectedQuestion = questionPool.splice(randomIndex, 1)[0];
+            
+            document.getElementById('chapter-label').innerText = selectedQuestion.chapter;
+            document.getElementById('question-text').innerText = selectedQuestion.text;
+            
+            // Hide translation on new question draw
+            currentThaiTranslation = selectedQuestion.thai;
+            const translationBox = document.getElementById('translation-text');
+            translationBox.innerText = currentThaiTranslation;
+            translationBox.style.display = "none";
+
+            // Update remaining counter
+            document.getElementById('counter-badge').innerText = `Remaining: ${questionPool.length} / ${allQuestions.length}`;
+
+            if (document.getElementById('auto-sound').checked) {
+                speakQuestion();
+            }
+        }
+
+        function speakQuestion() {
+            const questionText = document.getElementById('question-text').innerText;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(questionText);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.95; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech sound is not supported in this browser.');
+            }
+        }
+
+        function toggleTranslation() {
+            const translationBox = document.getElementById('translation-text');
+            if (!currentThaiTranslation) return;
+            
+            if (translationBox.style.display === "block") {
+                translationBox.style.display = "none";
+            } else {
+                translationBox.style.display = "block";
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+            }
+        }
+    </script>
+</body>
+</html>
